@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Auto volume: an ear listening to the room, and the sound it sends back -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- the ear -->
+    <g stroke="#3d4752" stroke-width="30">
+      <path d="M 62 150 C 62 80 125 38 190 38 C 270 38 325 95 325 175 C 325 245 285 280 250 320 C 220 355 215 395 190 425 C 165 455 115 460 85 435 C 68 420 60 402 60 385"/>
+      <path d="M 120 200 C 120 145 155 108 200 108 C 245 108 272 140 272 182"/>
+      <path d="M 150 225 C 150 190 172 168 200 168 C 228 168 245 190 245 222 C 245 262 210 280 180 290 C 150 300 140 320 140 345 C 140 370 118 382 100 372"/>
+      <path d="M 178 250 C 196 248 206 236 202 222"/>
+    </g>
+    <!-- the sound: three lines, the middle one longest, like a volume going up -->
+    <g stroke="#2f78c4" stroke-width="26">
+      <path d="M 385 175 L 445 160"/>
+      <path d="M 380 240 L 480 240"/>
+      <path d="M 385 305 L 445 320"/>
+    </g>
+  </g>
+</svg>

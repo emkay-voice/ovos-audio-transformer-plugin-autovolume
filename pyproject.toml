@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ovos-audio-transformer-plugin-autovolume"
+version = "0.0.1a1"
+description = "OpenVoiceOS audio transformer: speaks up when the room is noisy and softly when it is quiet, learning the volume you like from the times you set it yourself - only loudness is measured, nothing recorded or sent"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+authors = [{name = "emkay-voice"}]
+maintainers = [{name = "Andreas Lorensen"}]
+requires-python = ">=3.10"
+keywords = ["ovos", "openvoiceos", "plugin", "audio-transformer", "volume", "auto-volume", "noise", "privacy", "emkay"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Multimedia :: Sound/Audio",
+]
+dependencies = [
+    "ovos-plugin-manager>=0.0.26",
+    "ovos-utils>=0.0.38",
+    "ovos-bus-client>=0.0.8",
+    "ovos-config>=0.0.12",
+    "numpy",
+]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[project.urls]
+Homepage = "https://github.com/emkay-voice/ovos-audio-transformer-plugin-autovolume"
+Issues = "https://github.com/emkay-voice/ovos-audio-transformer-plugin-autovolume/issues"
+Emkay = "https://github.com/emkay-voice/emkay"
+
+[project.entry-points."opm.transformer.audio"]
+ovos-audio-transformer-plugin-autovolume = "ovos_audio_transformer_plugin_autovolume:AutoVolumePlugin"
+
+[tool.setuptools]
+packages = ["ovos_audio_transformer_plugin_autovolume"]
