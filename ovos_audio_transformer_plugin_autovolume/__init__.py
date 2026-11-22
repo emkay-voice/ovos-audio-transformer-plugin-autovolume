@@ -108,6 +108,7 @@ class AutoVolumePlugin(AudioTransformer):
         on("ovos.autovolume.disable", self._on_disable)
         on("ovos.autovolume.forget", self._on_forget)
         on("ovos.autovolume.status", self._on_status)
+        on("ovos.autovolume.reload", self._on_reload)
         on("recognizer_loop:audio_output_start", lambda m: self._pause("_speaking", True))
         on("recognizer_loop:audio_output_end", lambda m: self._pause("_speaking", False))
         on("recognizer_loop:record_begin", lambda m: self._pause("_recording", True))
@@ -372,6 +373,9 @@ class AutoVolumePlugin(AudioTransformer):
             "target": None if goal is None else round(goal, 3),
             "volume": self._volume,
             "paused": self.paused(),
+            # the same two as whole percents, for the control panel's page
+            "target_pct": None if goal is None else round(goal * 100),
+            "volume_pct": None if self._volume is None else round(self._volume * 100),
         }
 
     def _reply(self, message):
@@ -398,4 +402,23 @@ class AutoVolumePlugin(AudioTransformer):
         self._reply(message)
 
     def _on_status(self, message):
+        self._reply(message)
+
+    def _on_reload(self, message):
+        """The control panel saved the settings: use them now, no restart.
+
+        Only what the page sets is taken (speech_only, low, high, hold_seconds);
+        what was learned stays. Turning it on or off is the enable/disable
+        messages, remembered in the state file, so "enabled" is not read here."""
+        c = (message.data or {}).get("config") or {}
+        with self._lock:
+            if "speech_only" in c:
+                self.speech_only = bool(c["speech_only"])
+            if "hold_seconds" in c:
+                self.hold_seconds = float(c["hold_seconds"])
+            low = float(c.get("low", self.curve.low))
+            high = float(c.get("high", self.curve.high))
+            self.curve.low, self.curve.high = clamp(min(low, high), 0.0, 1.0), clamp(max(low, high), 0.0, 1.0)
+        LOG.info(f"auto volume: settings reloaded (speech_only={self.speech_only}, "
+                 f"low={self.curve.low}, high={self.curve.high}, hold={self.hold_seconds}s)")
         self._reply(message)

@@ -103,14 +103,27 @@ Name it in `mycroft.conf` (that is the opt-in):
 | `ovos.autovolume.enable` / `.disable` | turn it on and off (remembered) |
 | `ovos.autovolume.forget` | forget what it has learned: your volumes and the room |
 | `ovos.autovolume.status` | how it stands |
+| `ovos.autovolume.reload` | use new settings now (`{"config": {...}}`, as the control panel sends after saving) |
 
 Each answers with `<message>.response`:
 
 ```json
 {"enabled": true, "speech_only": true, "points": 4, "learning": true,
  "level_db": -47.3, "quiet_db": -61.5, "noisy_db": -38.5,
- "target": 0.48, "volume": 0.47, "paused": false}
+ "target": 0.48, "volume": 0.47, "paused": false,
+ "target_pct": 48, "volume_pct": 47}
 ```
+
+## In the control panel
+
+The plugin brings its own page for [ovos-control-panel](https://github.com/OpenVoiceOS/ovos-control-panel)
+(`controlpanel.json`, under *Voice*): how loud the room is now, the room's quiet
+and noisy ends, the volume it aims for and whether the curve is yours yet,
+buttons to turn it on and off and to forget what it has learned, and the
+settings above (only for speech, the quiet and noisy volumes, how long it leaves
+your own volume alone). Saved settings go in
+`audio_transformers.ovos-audio-transformer-plugin-autovolume` and are used at
+once. In all of Emkay's languages.
 
 ## Emkay
 
