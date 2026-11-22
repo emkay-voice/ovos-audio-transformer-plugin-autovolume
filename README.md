@@ -95,6 +95,7 @@ Name it in `mycroft.conf` (that is the opt-in):
 | `hold_seconds` | `300` | after you set the volume, it is left alone this long |
 | `tail_seconds` | `3` | it waits this long after speech or playback |
 | `min_points` | `2` | how many of your own settings before they shape the curve |
+| `inline` | on only in Pyodide | measure and adjust as the audio arrives, without threads of its own (for Pythons that have none, as in [Emkay](https://github.com/emkay-voice/emkay)) |
 
 ## On the bus
 

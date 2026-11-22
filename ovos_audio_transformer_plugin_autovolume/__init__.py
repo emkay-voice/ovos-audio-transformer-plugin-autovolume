@@ -14,6 +14,10 @@ It learns from you: when you set the volume yourself, that is a point (noise
 now, the volume you chose), and the curve goes through your points. It keeps
 its hands off while the device speaks, listens or plays something.
 
+Where Python has no threads (Pyodide, as in Emkay) it does its work as the
+audio arrives instead (``inline``): one chunk's power is one small sum, and the
+volume is looked at every ``step_seconds`` of audio.
+
 Off by default: OVOS only loads it when it is named in the
 ``audio_transformers`` config, and ``"active": false`` turns it off again.
 """
@@ -22,6 +26,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import sys
 import queue
 import threading
 import time
@@ -36,6 +41,8 @@ from ovos_utils.log import LOG
 from ovos_audio_transformer_plugin_autovolume.curve import Curve, RoomRange, clamp
 
 PLUGIN_ID = "ovos-audio-transformer-plugin-autovolume"
+#: Pyodide (Emkay) can't start threads: work in on_audio there
+NO_THREADS = sys.platform == "emscripten"
 #: OCP player state "playing" (ovos_utils.ocp.PlayerState.PLAYING)
 OCP_PLAYING = 1
 #: below this the level is just digital silence
@@ -63,6 +70,8 @@ class AutoVolumePlugin(AudioTransformer):
     hold_seconds: after you set the volume yourself it is left alone this long, default 300.
     tail_seconds: measuring and adjusting wait this long after speech or playback, default 3.
     min_points: how many of your own settings before they shape the curve, default 2.
+    inline: measure and adjust in on_audio rather than in threads of its own,
+        default on only where Python has no threads (Pyodide).
     """
 
     def __init__(self, config=None):
@@ -97,6 +106,8 @@ class AutoVolumePlugin(AudioTransformer):
         self._room_saved = 0.0
         self._stop = threading.Event()
         self._threads = []
+        self.inline = bool(c.get("inline", NO_THREADS))
+        self._next_step = 0.0                   # monotonic: inline, when to look at the volume next
         self._load()
 
     # ---- setup --------------------------------------------------------------
@@ -119,7 +130,7 @@ class AutoVolumePlugin(AudioTransformer):
             on(f"mycroft.volume.{kind}", self._on_volume_step)
         on("mycroft.volume.get.response", self._on_volume_response)
         # the transformer service binds but never calls initialize(): start here
-        if not self._threads:
+        if not self._threads and not self.inline:
             for target, name in ((self._measure_loop, "autovolume-measure"),
                                  (self._control_loop, "autovolume-control")):
                 t = threading.Thread(target=target, name=name, daemon=True)
@@ -172,12 +183,25 @@ class AutoVolumePlugin(AudioTransformer):
 
     def on_audio(self, audio_data):
         """Room audio while waiting for the wake word. Never blocks the listener."""
-        if self.enabled and not self.paused():
+        if self.inline:
+            self._inline(audio_data)
+        elif self.enabled and not self.paused():
             try:
                 self._queue.put_nowait(audio_data)
             except queue.Full:
                 pass            # behind: drop it, never stall the microphone
         return audio_data
+
+    def _inline(self, chunk: bytes):
+        """Without threads: measure this chunk, and every step_seconds look at the volume."""
+        try:
+            self.measure(chunk)
+            now = time.monotonic()
+            if now >= self._next_step:
+                self._next_step = now + self.step_seconds
+                self.tick()
+        except Exception:
+            LOG.exception("auto volume: could not measure a chunk")
 
     def _measure_loop(self):
         while not self._stop.is_set():

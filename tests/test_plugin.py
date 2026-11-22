@@ -100,6 +100,24 @@ def test_the_worker_thread_measures(make):
     assert p.level_db() is not None
 
 
+def test_inline_without_threads(make):
+    """Where there are no threads (Pyodide) it measures and steps as the audio arrives."""
+    p = make(inline=True)
+    assert p._threads == []
+    ticks = []
+    p.tick = lambda: ticks.append(1)
+    for _ in range(50):
+        p.on_audio(tone(-35))
+    assert p.level_db() is not None
+    assert ticks == [1]                     # the first chunk steps, the next only after step_seconds
+
+
+def test_inline_by_default_only_without_threads(make, monkeypatch):
+    assert make().inline is False
+    monkeypatch.setattr(av, "NO_THREADS", True)
+    assert make().inline is True
+
+
 # ---- adjusting smoothly -----------------------------------------------------
 
 def test_turns_up_in_a_noisy_room_slowly(make):
