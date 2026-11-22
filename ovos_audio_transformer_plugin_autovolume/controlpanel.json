@@ -1,0 +1,194 @@
+{
+ "controlpanel": 1,
+ "id": "autovolume",
+ "title": "av.title",
+ "group": "voice",
+ "order": 40,
+ "icon": "controlpanel.svg",
+ "bus": "ovos.autovolume.",
+ "blocks": [
+  {
+   "type": "text",
+   "text": "av.intro"
+  },
+  {
+   "type": "status",
+   "heading": "av.now",
+   "query": "ovos.autovolume.status",
+   "refresh": 10,
+   "rows": [
+    {
+     "label": "av.state",
+     "text": "av.on",
+     "when": "enabled"
+    },
+    {
+     "label": "av.state",
+     "text": "av.off",
+     "when": "!enabled"
+    },
+    {
+     "text": "av.holding",
+     "when": "paused"
+    },
+    {
+     "label": "av.room",
+     "value": "{level_db} dB",
+     "when": "level_db"
+    },
+    {
+     "label": "av.room",
+     "text": "av.measuring",
+     "when": "!level_db"
+    },
+    {
+     "label": "av.range",
+     "value": "{quiet_db} … {noisy_db} dB",
+     "when": "quiet_db"
+    },
+    {
+     "label": "av.target",
+     "text": "av.pct.value",
+     "when": "target_pct"
+    },
+    {
+     "label": "av.volume",
+     "text": "av.pct.volume",
+     "when": "volume_pct"
+    },
+    {
+     "label": "av.points",
+     "value": "{points}"
+    },
+    {
+     "label": "av.curve",
+     "text": "av.curve.yours",
+     "when": "learning"
+    },
+    {
+     "label": "av.curve",
+     "text": "av.curve.default",
+     "when": "!learning"
+    }
+   ],
+   "actions": [
+    {
+     "label": "av.turn_off",
+     "send": "ovos.autovolume.disable",
+     "privileged": false,
+     "when": "enabled"
+    },
+    {
+     "label": "av.turn_on",
+     "send": "ovos.autovolume.enable",
+     "privileged": false,
+     "when": "!enabled"
+    },
+    {
+     "label": "av.forget",
+     "send": "ovos.autovolume.forget",
+     "confirm": "av.forget.sure",
+     "done": "av.forget.done"
+    }
+   ]
+  },
+  {
+   "type": "form",
+   "heading": "av.settings",
+   "save": {
+    "config": "audio_transformers.ovos-audio-transformer-plugin-autovolume",
+    "reload": "ovos.autovolume.reload"
+   },
+   "fields": [
+    {
+     "name": "speech_only",
+     "label": "av.speech_only",
+     "hint": "av.speech_only.hint",
+     "type": "checkbox",
+     "default": true
+    },
+    {
+     "name": "low",
+     "label": "av.low",
+     "hint": "av.levels.hint",
+     "type": "select",
+     "default": 0.35,
+     "options": [
+      {
+       "value": 0.2,
+       "label": "av.pct.20"
+      },
+      {
+       "value": 0.3,
+       "label": "av.pct.30"
+      },
+      {
+       "value": 0.35,
+       "label": "av.pct.35"
+      },
+      {
+       "value": 0.4,
+       "label": "av.pct.40"
+      },
+      {
+       "value": 0.5,
+       "label": "av.pct.50"
+      }
+     ]
+    },
+    {
+     "name": "high",
+     "label": "av.high",
+     "type": "select",
+     "default": 0.75,
+     "options": [
+      {
+       "value": 0.6,
+       "label": "av.pct.60"
+      },
+      {
+       "value": 0.7,
+       "label": "av.pct.70"
+      },
+      {
+       "value": 0.75,
+       "label": "av.pct.75"
+      },
+      {
+       "value": 0.85,
+       "label": "av.pct.85"
+      },
+      {
+       "value": 1.0,
+       "label": "av.pct.100"
+      }
+     ]
+    },
+    {
+     "name": "hold_seconds",
+     "label": "av.hold",
+     "type": "select",
+     "default": 300,
+     "options": [
+      {
+       "value": 60,
+       "label": "av.hold.1"
+      },
+      {
+       "value": 300,
+       "label": "av.hold.5"
+      },
+      {
+       "value": 900,
+       "label": "av.hold.15"
+      },
+      {
+       "value": 1800,
+       "label": "av.hold.30"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

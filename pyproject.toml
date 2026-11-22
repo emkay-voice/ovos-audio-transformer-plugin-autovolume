@@ -39,3 +39,7 @@ ovos-audio-transformer-plugin-autovolume = "ovos_audio_transformer_plugin_autovo
 
 [tool.setuptools]
 packages = ["ovos_audio_transformer_plugin_autovolume"]
+
+# the control panel's page (controlpanel.json, its icon and strings)
+[tool.setuptools.package-data]
+ovos_audio_transformer_plugin_autovolume = ["controlpanel.json", "controlpanel.svg", "locale/*/*.json"]

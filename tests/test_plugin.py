@@ -315,3 +315,23 @@ def test_status(make):
     assert d["points"] == 0 and d["learning"] is False
     assert d["quiet_db"] < d["level_db"] < d["noisy_db"]
     assert 0.35 <= d["target"] <= 0.75
+    assert d["target_pct"] == round(d["target"] * 100)
+    assert d["volume_pct"] == 50
+
+
+def test_the_panel_reloads_the_settings(make):
+    p = make()
+    learn_room(p)
+    p.bus.emit(Message("mycroft.volume.set", {"percent": 0.6}))
+    learned = list(p.curve.points)
+    r = p.bus.wait_for_response(Message("ovos.autovolume.reload", {"config": {
+        "speech_only": False, "low": 0.2, "high": 0.85, "hold_seconds": 900}}))
+    assert r is not None and r.data["speech_only"] is False
+    assert (p.curve.low, p.curve.high, p.hold_seconds) == (0.2, 0.85, 900.0)
+    assert p.curve.points == learned        # what was learned stays
+
+
+def test_a_reload_with_low_above_high_is_put_right(make):
+    p = make()
+    p.bus.wait_for_response(Message("ovos.autovolume.reload", {"config": {"low": 0.9, "high": 0.4}}))
+    assert (p.curve.low, p.curve.high) == (0.4, 0.9)
