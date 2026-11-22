@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ovos-audio-transformer-plugin-autovolume"
-version = "0.0.1a2"
+version = "0.0.1a3"
 description = "OpenVoiceOS audio transformer: speaks up when the room is noisy and softly when it is quiet, learning the volume you like from the times you set it yourself - only loudness is measured, nothing recorded or sent"
 readme = "README.md"
 license = {text = "Apache-2.0"}
